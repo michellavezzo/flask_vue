@@ -10,10 +10,9 @@
 
 `brew services start mongodb-community@6.0`
 
-
 # Seed Database 1st time using:
 
-`python seed.py `
+`python parser.py `
 
 # Run Flask
 
