@@ -2,27 +2,8 @@ import json
 import pymongo
 from utils.auth_utils import hash_password
 from datetime import datetime
-from dataclasses import dataclass
-from typing import List
-
-# Define MongoDB Connection 
-# TODO: CREATE ENV FOR MONGO CONNECTION
-client = pymongo.MongoClient("mongodb://localhost:27017/")
-db = client["testdb"]
-collection = db["users"]
-
-@dataclass
-class UserPreferences:
-    timezone: str
-
-@dataclass
-class User:
-    username: str
-    password: str
-    roles: List[str]
-    preferences: UserPreferences
-    created_ts: float
-    active: bool = True
+from models import User, UserPreferences
+from database import collection
 
 def load_json(file_path):
     with open(file_path, "r") as file:
