@@ -1,8 +1,24 @@
 <template>
     <v-container>
         <div class="list-header">
-            <!-- TODO: Input + Onchange search filter (on frontend) + debounce 500ms -->
-            <v-btn color="primary" class="mb-4" @click="openDialog()">
+            <v-responsive max-width="50%">
+                <v-text-field
+                    v-model="searchQuery"
+                    label="Search Users"
+                    prepend-inner-icon="mdi-magnify"
+                    outlined
+                    dense
+                    clearable
+                    @input="debouncedSearch"
+                ></v-text-field>
+            </v-responsive>
+            <v-btn
+                aria-label="Click to create a new user"
+                title="Click to create a new user"
+                color="primary"
+                class="mb-4"
+                @click="openDialog()"
+            >
                 Create User
             </v-btn>
         </div>
@@ -16,7 +32,7 @@
                 { title: 'Last Update', key: 'last_updated_at' },
                 { title: 'Actions', key: 'actions', sortable: false },
             ]"
-            :items="users"
+            :items="filteredUsers"
         >
             <template v-slot:[`item.username`]="{ item }">
                 <router-link :to="`/users/${(item as User).username}`">
@@ -56,14 +72,16 @@
             <template v-slot:[`item.actions`]="{ item }">
                 <v-btn
                     variant="plain"
-                    aria-label="Edit this user"
+                    :aria-label="`Click to Edit ${(item as User).username}`"
+                    :title="`Click to edit ${(item as User).username}`"
                     color="blue"
                     icon="mdi-pencil"
                     @click="openDialog(item as User)"
                 ></v-btn>
                 <v-btn
                     variant="plain"
-                    aria-label="Delete this user"
+                    :aria-label="`Click to delete ${(item as User).username}`"
+                    :title="`Click to delete ${(item as User).username}`"
                     color="red"
                     icon="mdi-delete"
                     @click="deleteUser((item as User).username)"
@@ -72,7 +90,12 @@
         </v-data-table>
     </v-container>
 
-    <UserDialog v-model="dialog" :user="selectedUser" @save="fetchUsers" />
+    <UserDialog
+        v-model="dialog"
+        v-if="dialog"
+        :user="selectedUser"
+        @save="fetchUsers"
+    />
 </template>
 
 <script setup lang="ts">
@@ -83,11 +106,16 @@ import { useRouter } from "vue-router";
 import UserDialog from "@/components/UserDialog.vue";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
+import debounce from "lodash/debounce";
 
 const store = useStore();
 const router = useRouter();
 
 const users = computed(() => store.getters["user/getUsers"]);
+const searchQuery = ref("");
+const dialog = ref(false);
+const selectedUser = ref<User | undefined>(undefined);
+const clientTimezone = ref(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
 const chipRoles = (roles: string[]) => {
     return roles.map((role) => ({
@@ -96,20 +124,11 @@ const chipRoles = (roles: string[]) => {
     }));
 };
 
-const dialog = ref(false);
-const selectedUser = ref<User | undefined>(undefined);
-const clientTimezone = ref(Intl.DateTimeFormat().resolvedOptions().timeZone);
-
 const fetchUsers = async () => {
-    console.log("aaaab");
     await store.dispatch("user/fetchUsers");
 };
 
 onMounted(fetchUsers);
-
-const editUser = (username: string) => {
-    router.push(`/users/${username}`);
-};
 
 const deleteUser = async (username: string) => {
     if (confirm("Are you sure?")) {
@@ -126,13 +145,26 @@ const formatTimestamp = (timestamp: number) => {
     const date = toZonedTime(new Date(timestamp * 1000), clientTimezone.value);
     return format(date, "EE, d/MM/yyyy | HH:mm:ss | 'GMT'XXX");
 };
+
+const filteredUsers = computed(() => {
+    return users.value.filter((user: User) =>
+        user.username
+            .toLowerCase()
+            .includes((searchQuery.value || "").toLowerCase())
+    );
+});
+
+const debouncedSearch = debounce(() => {
+    searchQuery.value = searchQuery.value ? searchQuery.value.trim() : "";
+}, 500);
 </script>
 
 <style scoped>
 .list-header {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
+    margin-bottom: 10px;
 }
 .chip-role {
     text-transform: capitalize;
