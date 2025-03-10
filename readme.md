@@ -1,11 +1,19 @@
+# Before running the application, make sure you have the following installed
+
+Python
+Flask
+MongoDB[https://www.mongodb.com/]
+pymongo
+
 # Activate the environment
 
 `cd backend`
-`.venv/bin/activate`
+`python3 -m venv venv`
+`source venv/bin/activate`
 
 # Install Flask and Dependencies
 
-`pip install Flask Flask-PyMongo Flask-Cors bcrypt` // Check this before submit
+`pip install flask pymongo flask-cors bcrypt`
 
 # Start Mongo (macos)
 
@@ -23,6 +31,8 @@
 
 #### Frontend has its own readme.md
 
+Open a new terminal
+
 `cd frontend`
 `npm install`
 `npm run serve`
@@ -33,7 +43,7 @@
 - Dockerize the app
 - (Front) Add an option on frontend to choose if the user wants to see its own timezone or the timezone of the user in the list.
 - Improve componentization, avoid repeat some code as I did for the Tags on the frontend.
-- There is a bug on users/:user_name. As I passed the user as props, when you edit an user from there data is not rerrendered as it should be. I would like to fix this. (If this not happened to you, I fixed that already)
+- There is a bug on users/:user_name. When you edit an user from there data is not rerrendered as it should be. I would like to fix this.
 - Better Documentation
 - Setup .env file for better code management
 
