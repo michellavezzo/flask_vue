@@ -10,7 +10,8 @@
                         v-model="localUser.username"
                         label="Username"
                         :rules="[rules.required]"
-                        required
+                        :required="!isEditMode"
+                        :disabled="isEditMode"
                     ></v-text-field>
                     <v-text-field
                         v-model="localUser.password"
@@ -57,18 +58,21 @@ const store = useStore();
 const props = defineProps<{ modelValue: boolean; user?: User }>();
 const emit = defineEmits(["update:modelValue", "save"]);
 const valid = ref(false);
-const form = ref<{ validate: () => Promise<boolean> } | null>(null);
+const form = ref<{
+    validate: () => Promise<boolean>;
+    reset: () => void;
+} | null>(null);
 
-const localUser = ref<User>(
-    props.user || {
-        username: "",
-        password: "",
-        roles: [],
-        preferences: { timezone: "" },
-        active: true,
-        created_ts: Date.now() / 1000,
-    }
-);
+const defaultUser = (): User => ({
+    username: "",
+    password: "",
+    roles: [],
+    preferences: { timezone: "" },
+    active: true,
+    created_ts: Date.now() / 1000,
+});
+
+const localUser = ref<User>(props.user ? { ...props.user } : defaultUser());
 const timezones = ref(Intl.supportedValuesOf("timeZone"));
 const isEditMode = computed(() => !!props.user);
 const dialog = computed({
@@ -79,16 +83,7 @@ const dialog = computed({
 watch(
     () => props.user,
     (newVal) => {
-        localUser.value = newVal
-            ? { ...newVal }
-            : {
-                  username: "",
-                  password: "",
-                  roles: [],
-                  preferences: { timezone: "" },
-                  active: true,
-                  created_ts: Date.now() / 1000,
-              };
+        localUser.value = newVal ? { ...newVal } : defaultUser();
     }
 );
 
@@ -129,14 +124,12 @@ const saveUser = async (submitEventPromise: SubmitEventPromise) => {
 };
 
 const closeDialog = () => {
-    localUser.value = {
-        username: "",
-        password: "",
-        roles: [],
-        preferences: { timezone: "" },
-        active: true,
-        created_ts: Date.now() / 1000,
-    };
+    resetForm();
     emit("update:modelValue", false);
+};
+
+const resetForm = () => {
+    localUser.value = props.user ? { ...props.user } : defaultUser();
+    form.value?.reset();
 };
 </script>
