@@ -1,7 +1,7 @@
 import json
 import pymongo
 from utils.auth_utils import hash_password
-from datetime import datetime
+from datetime import datetime, timezone
 from models import User, UserPreferences
 from database import collection
 
@@ -25,6 +25,7 @@ def insert_users(file_path):
             roles=roles,
             preferences=UserPreferences(timezone=item["user_timezone"]),
             active=item.get("is_user_active", True),
+            last_updated_at=datetime.now(timezone.utc).timestamp(),
             created_ts=datetime.strptime(item["created_at"], "%Y-%m-%dT%H:%M:%SZ").timestamp()
         )
         user_dict = user.__dict__  # Convert User to dictionary
