@@ -148,9 +148,9 @@ const formatTimestamp = (timestamp: number) => {
 
 const filteredUsers = computed(() => {
     return users.value.filter((user: User) =>
-        user.username
+        String(user.username)
             .toLowerCase()
-            .includes((searchQuery.value || "").toLowerCase())
+            .includes((searchQuery.value || "").toString().toLowerCase())
     );
 });
 
