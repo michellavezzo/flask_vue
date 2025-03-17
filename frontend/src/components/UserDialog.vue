@@ -92,7 +92,9 @@ const rules = {
     roles: (value: string[]) =>
         value.length > 0 || "At least one role must be selected",
     requiredOnCreate: (value: string) =>
-        (isEditMode.value && !value) || "This field is required",
+        (!isEditMode.value && !!value) ||
+        isEditMode.value ||
+        "This field is required",
     minLength: (length: number) => (value: string) =>
         (value && value.length >= length) ||
         `Minimum length is ${length} characters`,
