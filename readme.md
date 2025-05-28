@@ -46,5 +46,3 @@ Open a new terminal
 - There is a bug on users/:user_name. When you edit an user from there data is not rerrendered as it should be. I would like to fix this.
 - Better Documentation
 - Setup .env file for better code management
-
-- This test was very fun, congratulations for who did it.
