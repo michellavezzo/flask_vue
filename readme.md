@@ -47,4 +47,4 @@ Open a new terminal
 - Better Documentation
 - Setup .env file for better code management
 
-- This test was very fun, congratulations for who did it. I would like to add more features and improve the code, but I have to submit it now. I hope you like it. Thank you for the opportunity.
+- This test was very fun, congratulations for who did it.
